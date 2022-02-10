@@ -7,7 +7,7 @@ numeros = []
 cripLetras = []
 c = 0
 comando = 4
-str_comandos = 'Para utilizar a codificadora digite:\n      1: Criptografar uma mensagem\n      2: Decriptografar uma mensagem\n      3: Saber a chave de encriptação\n      0: Parar o programa'
+str_comandos = 'Para utilizar a codificadora digite:\n      1: Criptografar uma mensagem\n      2: Descriptografar uma mensagem\n      3: Saber a chave de encriptação\n      0: Parar o programa'
 
 #definição da tupla base do alfabeto
 ALFABETO = ('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Ç', ' ')
