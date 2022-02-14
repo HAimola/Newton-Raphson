@@ -62,6 +62,6 @@ while comando != 0:
         elif comando == 0:
             sleep(1)
             print('Obrigado por utilizar nosso programa!')
-        else:
-            print('Comando inválido, digite novamente')
+    else:
+        print('Comando inválido, digite novamente')
     sleep(3)
