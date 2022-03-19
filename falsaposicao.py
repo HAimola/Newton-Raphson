@@ -5,7 +5,7 @@
 import sympy as sp
 from sympy.parsing.sympy_parser import parse_expr
 
-print('''Esta é uma calculadora de raízes pelo método da bisseção
+print('''Esta é uma calculadora de raízes pelo método da falsa posição
 Sua precisão é de 6 casas decimais
 Digite seguindo o modelo: x² -2x + 3  -->  x**2 - 2*x +3
 !ATENÇÃO: Para funções trigonométricas, digite a abreviação em inglês\n''')
