@@ -1,4 +1,4 @@
-#Objetivo: Fazer um programa que ache a raiz a partir do algoritmo da bisseção
+#Objetivo: Fazer um programa que ache a raiz a partir do algoritmo da falsa posição
 #Autor: Heloísa Rades de Souza      Data:18/03/2022
 
 #importar bibliotecas
