@@ -30,20 +30,25 @@ def Media(a,b):
     return med
 
 #Início do Algoritmo da Falsa Posição
-if f(a, funcao)*f(b, funcao) < 0: #Confere a principal definição para haver uma raíz no intervalo
-    while True:   #Loop de repetição infinita
-       x0 = Media(a,b)
-       
-       #Saída apresentando os valores de cada variável e valor de função com 5 casas decimais
-       print(f'''a = {a:.6f} | b = {b:.6f} | x = {x0:.6f} | f(a) = {f(a, funcao):.6f} | f(x) = {f(x0, funcao):.6f} | sinal = {f(a, funcao)*f(b, funcao):.6f} | E1 = {(b-a):.6f} | E2 = {f(x0, funcao):.6f}''')
-       
-       if (b-a) < erro1 or abs(f(x0, funcao)) < erro2:  #Confere se a diferença intervalo é menor que o erro informado e finaliza o programa
-           print(f'{x0:.6f} é a raiz da função')
-           break
-       else:  #Caso não seja menor, o valor da média é atribuido ao começo ou fim do intervalo, dependendo do valor identificado como "sinal"
-           if f(a, funcao)*f(x0, funcao) > 0: 
-               a = x0
-           else:
-               b = x0
+if f(a, funcao)*f(b, funcao) < 0:  #Confere a principal definição para haver uma raíz no intervalo
+    if abs(f(a, funcao)) < erro2:
+        print(f'A raiz da função é {a}')
+    elif abs(f(b, funcao)) < erro2:
+        print(f'A raiz da função é {b}')
+    else: 
+        while True:   #Loop de repetição infinita
+            x0 = Media(a,b)
+            
+            #Saída apresentando os valores de cada variável e valor de função com 5 casas decimais
+            print(f'''a = {a:.6f} | b = {b:.6f} | x = {x0:.6f} | f(a) = {f(a, funcao):.6f} | f(b) = {f(b, funcao):.6f} | f(x) = {f(x0, funcao):.6f} | sinal = {f(a, funcao)*f(b, funcao):.6f} | E1 = {(b-a):.6f} | E2 = {f(x0, funcao):.6f}''')
+            
+            if (b-a) < erro1 or abs(f(x0, funcao)) < erro2:  #Confere se a diferença intervalo é menor que o erro informado e finaliza o programa
+                print(f'{x0:.6f} é a raiz da função')
+                break
+            else:  #Caso não seja menor, o valor da média é atribuido ao começo ou fim do intervalo, dependendo do valor identificado como "sinal"
+                if f(a, funcao)*f(x0, funcao) > 0: 
+                    a = x0
+                else:
+                    b = x0
 else:
     print('Não há raíz para este intervalo')
