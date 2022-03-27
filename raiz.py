@@ -34,12 +34,6 @@ def acabou(a: float, b: float = 0, met: Metodo = None, f: Callable = None, erros
         e1 = erros[0]
         e2 = erros[1]
 
-        #print(abs(f(a)) < e2)
-        #print(abs(f(b)) < e2)
-        #print((b-a) < e1)
-        #print(media(a, b, met, func))
-        #print(abs(f(media(a, b, met, func))) < e2)
-
         return abs(f(a)) < e2 or abs(f(b)) < e2 or (b-a) < e1 or abs(f(media(a, b, met, f))) < e2
 
     if met == Metodo.NEWTON_RAPHSON:
@@ -110,7 +104,7 @@ def main():
                 a = sp.Float(x0, precision)
             else:
                 b = sp.Float(x0, precision)
-    else:
+    else: # Se for Newton-Raphson
         table = pd.DataFrame(columns= ["Xk", "Xk+1", "f(x)", "f'(x)", "E"])
         while not acabou(a, b, met, f, erros):
             f_linha = lambda num: sp.Float(sp.diff(func, x).subs(x, num), precision+5)
