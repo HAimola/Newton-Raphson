@@ -37,7 +37,7 @@ def acabou(a: float, b: float = 0, met: Metodo = None, f: Callable = None, erros
         return abs(f(a)) < e2 or abs(f(b)) < e2 or (b-a) < e1 or abs(f(media(a, b, met, f))) < e2
 
     if met == Metodo.NEWTON_RAPHSON:
-        return abs(f(b)) < erros[0]
+        return abs(f(a)) < erros[0]
 
 
 def main():
@@ -78,7 +78,7 @@ def main():
         erros.append(0)
         menor_erro = erros[0]
 
-    precision = math.ceil(abs(math.log(menor_erro, 10)) + math.log(b, 10) + 1)
+    precision = math.ceil(abs(math.log(menor_erro, 10)) + math.log(b, 10) + 2)
     f = lambda num: sp.Float(func.subs(x, num), precision)
     a = sp.Float(a, precision)
     b = sp.Float(b, precision)
@@ -93,7 +93,7 @@ def main():
             print('Não há raíz para este intervalo')
             return
 
-        while not acabou(a, b, met, f, erros):  # Loop de repetição infinita
+        while not acabou(a, b, met, f, erros):
             x0 = media(a, b, met, f)
 
             table = table.append(pd.Series([a, b, x0, f(a), f(b), f(x0), math.copysign(1, f(a)*f(b)), round(b-a, precision),
@@ -105,20 +105,26 @@ def main():
             else:
                 b = sp.Float(x0, precision)
     else: # Se for Newton-Raphson
+        x0 = b
         table = pd.DataFrame(columns= ["Xk", "Xk+1", "f(x)", "f'(x)", "E"])
-        while not acabou(a, b, met, f, erros):
-            f_linha = lambda num: sp.Float(sp.diff(func, x).subs(x, num), precision+5)
 
-            b = b - (f(b)/f_linha(b))
-            table = table.append(pd.Series([b, b - (f(b)/f_linha(b)), f(b),
-                                            f_linha(b), f(b)], index=table.columns), ignore_index=True)
+        # Função acabou verifica se f(x0) < erro
+        while not acabou(x0, f=f, met=Metodo.NEWTON_RAPHSON, erros=erros):
+            # Derivada da função
+            f_linha = lambda num: sp.Float(sp.diff(func, x).subs(x, num), precision)
 
-    # Saída apresentando os valores de cada variável e valor de função com 5 casas decimais
+            x0 = x0 - (f(x0)/f_linha(x0))
+
+            # Impresão de variáveis em formato de tabela
+            table = table.append(pd.Series([x0, x0 - (f(x0)/f_linha(x0)), f(x0),
+                                            f_linha(x0), f(x0)], index=table.columns), ignore_index=True)
+
+
+    # Saída apresentando os valores de cada variável e valor de função
     table.index = range(1, table.shape[0] + 1)
     table.index.name = "K"
     with pd.option_context("display.max_columns", table.shape[1]):
         print(table)
-
 
 if __name__ == "__main__":
     main()
