@@ -11,19 +11,21 @@ class Metodo(Enum):
     FALSA_POSICAO = auto()
     NEWTON_RAPHSON = auto()
 
+
 x = sp.Symbol("x")
 
 
 def media(a: float, b: float, met: Metodo, f: Callable = None, prec: float = 15):
     if met == Metodo.BISSECAO:
-        return (a+b)/2
+        return (a + b) / 2
     elif met == Metodo.FALSA_POSICAO:
-        return (a*f(b) - b*f(a))/(f(b)-f(a))
+        return (a * f(b) - b * f(a)) / (f(b) - f(a))
+
 
 def acabou(a: float, b: float = 0, met: Metodo = None, f: Callable = None, erros: list[float] = None):
     assert isinstance(met, Metodo)
     if met == Metodo.BISSECAO:
-        return abs((a-b)/2) <= erros[0]
+        return abs((a - b) / 2) <= erros[0]
 
     if met == Metodo.FALSA_POSICAO:
         assert len(erros) == 1 or len(erros) == 2
@@ -34,17 +36,16 @@ def acabou(a: float, b: float = 0, met: Metodo = None, f: Callable = None, erros
         e1 = erros[0]
         e2 = erros[1]
 
-        return abs(f(a)) < e2 or abs(f(b)) < e2 or (b-a) < e1 or abs(f(media(a, b, met, f))) < e2
+        return abs(f(a)) < e2 or abs(f(b)) < e2 or (b - a) < e1 or abs(f(media(a, b, met, f))) < e2
 
     if met == Metodo.NEWTON_RAPHSON:
         return abs(f(a)) < erros[0]
 
 
 def main():
-
     print("Esta é uma calculadora de raízes"
-    "Digite seguindo o modelo: x² -2x + 3  -->  x**2 - 2*x +3"
-    "!ATENÇÃO: Para funções trigonométricas, digite a abreviação em inglês\n")
+          "Digite seguindo o modelo: x² -2x + 3  -->  x**2 - 2*x +3"
+          "!ATENÇÃO: Para funções trigonométricas, digite a abreviação em inglês\n")
 
     print("Escolha o método para utilizar: \n"
           "[1] Bisseção\n"
@@ -96,35 +97,36 @@ def main():
         while not acabou(a, b, met, f, erros):
             x0 = media(a, b, met, f)
 
-            table = table.append(pd.Series([a, b, x0, f(a), f(b), f(x0), math.copysign(1, f(a)*f(b)), round(b-a, precision),
-                                            f(x0)], index=table.columns), ignore_index=True)
+            table = table.append(
+                pd.Series([a, b, x0, f(a), f(b), f(x0), math.copysign(1, f(a) * f(b)), round(b - a, precision),
+                           f(x0)], index=table.columns), ignore_index=True)
 
             # Caso não seja menor, o valor da média é atribuido ao começo ou fim do intervalo, dependendo do valor identificado como "sinal"
             if f(a) * f(x0) > 0:
                 a = sp.Float(x0, precision)
             else:
                 b = sp.Float(x0, precision)
-    else: # Se for Newton-Raphson
+    else:  # Se for Newton-Raphson
         x0 = b
-        table = pd.DataFrame(columns= ["Xk", "Xk+1", "f(x)", "f'(x)", "E"])
+        table = pd.DataFrame(columns=["Xk", "Xk+1", "f(x)", "f'(x)", "E"])
 
-        # Função acabou verifica se f(x0) < erro
+        # Função acabou verifica se erro < f(x0)
         while not acabou(x0, f=f, met=Metodo.NEWTON_RAPHSON, erros=erros):
             # Derivada da função
-            f_linha = lambda num: sp.Float(sp.diff(func, x).subs(x, num), precision)
+            def f_linha(num): return sp.Float(sp.diff(func, x).subs(x, num), precision)
 
-            x0 = x0 - (f(x0)/f_linha(x0))
+            x0 = x0 - (f(x0) / f_linha(x0))
 
             # Impresão de variáveis em formato de tabela
-            table = table.append(pd.Series([x0, x0 - (f(x0)/f_linha(x0)), f(x0),
+            table = table.append(pd.Series([x0, x0 - (f(x0) / f_linha(x0)), f(x0),
                                             f_linha(x0), f(x0)], index=table.columns), ignore_index=True)
-
 
     # Saída apresentando os valores de cada variável e valor de função
     table.index = range(1, table.shape[0] + 1)
     table.index.name = "K"
     with pd.option_context("display.max_columns", table.shape[1]):
         print(table)
+
 
 if __name__ == "__main__":
     main()
