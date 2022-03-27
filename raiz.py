@@ -82,7 +82,10 @@ def main(plot: bool = False) -> tuple[sp.Float, list[sp.Float]]:
         erros.append(0)
         menor_erro = erros[0]
 
-    precision = math.ceil(abs(math.log(menor_erro, 10)) + abs(math.log(b, 10)) + 2)
+    _b_mag= abs(math.log(b, 10)) if b != 0 else 1
+    precision = math.ceil(abs(math.log(menor_erro, 10)) + _b_mag + 3)
+    print(precision)
+
     f = lambda num: sp.Float(func.subs(x, num), precision)
     a = sp.Float(a, precision)
     b = sp.Float(b, precision)
@@ -161,6 +164,8 @@ def main(plot: bool = False) -> tuple[sp.Float, list[sp.Float]]:
 
         for x_point in tentativas:
             plt.plot(x_point, f(x_point), "og")
+
+        plt.text(raiz, f(raiz)*1.5, str(raiz))
         plt.show()
 
 if __name__ == "__main__":
