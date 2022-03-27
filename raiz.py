@@ -1,9 +1,12 @@
 from enum import Enum, auto
-from typing import Callable
+from typing import Callable, Union
 import math
+
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
 import sympy as sp
 import pandas as pd
-import numpy as np
 
 
 class Metodo(Enum):
@@ -42,7 +45,7 @@ def acabou(a: float, b: float = 0, met: Metodo = None, f: Callable = None, erros
         return abs(f(a)) < erros[0]
 
 
-def main():
+def main(plot: bool = False) -> tuple[sp.Float, list[sp.Float]]:
     print("Esta é uma calculadora de raízes"
           "Digite seguindo o modelo: x² -2x + 3  -->  x**2 - 2*x +3"
           "!ATENÇÃO: Para funções trigonométricas, digite a abreviação em inglês\n")
@@ -79,7 +82,7 @@ def main():
         erros.append(0)
         menor_erro = erros[0]
 
-    precision = math.ceil(abs(math.log(menor_erro, 10)) + math.log(b, 10) + 2)
+    precision = math.ceil(abs(math.log(menor_erro, 10)) + abs(math.log(b, 10)) + 2)
     f = lambda num: sp.Float(func.subs(x, num), precision)
     a = sp.Float(a, precision)
     b = sp.Float(b, precision)
@@ -97,8 +100,7 @@ def main():
         while not acabou(a, b, met, f, erros):
             x0 = media(a, b, met, f)
 
-            table = table.append(
-                pd.Series([a, b, x0, f(a), f(b), f(x0), math.copysign(1, f(a) * f(b)), round(b - a, precision),
+            table = table.append(pd.Series([a, b, x0, f(a), f(b), f(x0), math.copysign(1, f(a) * f(b)), round(b - a, precision),
                            f(x0)], index=table.columns), ignore_index=True)
 
             # Caso não seja menor, o valor da média é atribuido ao começo ou fim do intervalo, dependendo do valor identificado como "sinal"
@@ -106,20 +108,29 @@ def main():
                 a = sp.Float(x0, precision)
             else:
                 b = sp.Float(x0, precision)
+
+
     else:  # Se for Newton-Raphson
         x0 = b
+        # Cria uma tabela para impressão de variáveis
         table = pd.DataFrame(columns=["Xk", "Xk+1", "f(x)", "f'(x)", "E"])
+
+        # Derivada da função
+        def f_linha(num): return sp.Float(sp.diff(func, x).subs(x, num), precision)
 
         # Função acabou verifica se erro < f(x0)
         while not acabou(x0, f=f, met=Metodo.NEWTON_RAPHSON, erros=erros):
-            # Derivada da função
-            def f_linha(num): return sp.Float(sp.diff(func, x).subs(x, num), precision)
-
-            x0 = x0 - (f(x0) / f_linha(x0))
 
             # Impresão de variáveis em formato de tabela
             table = table.append(pd.Series([x0, x0 - (f(x0) / f_linha(x0)), f(x0),
                                             f_linha(x0), f(x0)], index=table.columns), ignore_index=True)
+
+            x0 = x0 - (f(x0) / f_linha(x0))
+
+        # Colocar ultima linha na tabela
+        table = table.append(pd.Series([x0, x0 - (f(x0) / f_linha(x0)), f(x0),
+                                        f_linha(x0), f(x0)], index=table.columns), ignore_index=True)
+
 
     # Saída apresentando os valores de cada variável e valor de função
     table.index = range(1, table.shape[0] + 1)
@@ -127,6 +138,30 @@ def main():
     with pd.option_context("display.max_columns", table.shape[1]):
         print(table)
 
+    if plot:
+        if met == Metodo.NEWTON_RAPHSON:
+            raiz = table["Xk"].iloc[-1]
+            tentativas = list(table["Xk"])
+        else:
+            raiz = table["x"].iloc[-1]
+            tentativas = list(table["x"])
+
+        i = (float(raiz) / 1.5, float(raiz) * 1.5)
+
+        x_arr = np.linspace(float(i[0]), float(i[1]), 100)
+        y_arr = np.array([], dtype=float)
+        for j in x_arr:
+            y_arr = np.append(y_arr, f(j))
+
+        _, ax = plt.subplots()
+        ax.plot(x_arr, y_arr, linewidth=2.0, color="red")
+        ax.set(xlim=i)
+
+        plt.axhline(0, color="black", linewidth=0.75)
+
+        for x_point in tentativas:
+            plt.plot(x_point, f(x_point), "og")
+        plt.show()
 
 if __name__ == "__main__":
-    main()
+    main("-plot" in sys.argv)
